@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRDG Range Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-zinc-700 selection:text-white">
+
+    <header class="border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-1.5 bg-zinc-800/80 text-zinc-200 rounded-xl border border-zinc-700/60 shadow-lg shadow-black/20 overflow-hidden w-10 h-10 flex items-center justify-center">
+                    <img src="https://shared.akamai.steamstatic.com/community_assets/images/apps/1867240/480db7d8ba4805eed0fea1a9e0564ae58042e4d8.jpg" alt="WRDG Icon" class="w-full h-full object-cover rounded-lg">
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        WRDG Range Calculator
+                    </h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="flex items-center bg-zinc-900 rounded-lg p-1 border border-zinc-800">
+                    <span class="text-xs text-zinc-400 px-2 font-medium">Unit Scale:</span>
+                    <select id="unit-scale-select" class="bg-zinc-950 text-zinc-200 text-xs font-mono font-medium rounded-md px-2 py-1 outline-none border border-zinc-800 cursor-pointer hover:border-zinc-600 transition">
+                        <option value="1">1 unit = 1m</option>
+                        <option value="100" selected>1 unit = 100m</option>
+                        <option value="1000">1 unit = 1km</option>
+                        <option value="0.3048">1 unit = 1 ft</option>
+                    </select>
+                </div>
+
+                <button id="btn-reset" class="px-3.5 py-1.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded-lg transition border border-zinc-800 flex items-center gap-1.5 active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Reset Fields
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-6 flex flex-col gap-6">
+
+            <div class="bg-zinc-900/80 border border-zinc-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden backdrop-blur-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div class="p-4 bg-zinc-950/80 rounded-xl border border-zinc-800 shadow-inner">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-zinc-200 inline-block ring-4 ring-zinc-700/50"></span>
+                                <h2 class="text-sm font-semibold text-zinc-200">Point A (Origin Anchor)</h2>
+                            </div>
+                            <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded font-mono border border-zinc-700">Canvas Center</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-zinc-400 mb-1 block">X₁ Coordinate</label>
+                                <input type="number" id="x1" value="0" step="any" class="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 rounded-lg px-3 py-2 text-sm text-white mono outline-none transition">
+                            </div>
+                            <div>
+                                <label class="text-xs text-zinc-400 mb-1 block">Y₁ Coordinate</label>
+                                <input type="number" id="y1" value="0" step="any" class="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 rounded-lg px-3 py-2 text-sm text-white mono outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-zinc-950/80 rounded-xl border border-zinc-800 shadow-inner">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-zinc-400 inline-block ring-4 ring-zinc-800"></span>
+                                <h2 class="text-sm font-semibold text-zinc-200">Point B (Target)</h2>
+                            </div>
+                            <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded font-mono border border-zinc-700">Interactive Drag</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-zinc-400 mb-1 block">X₂ Coordinate</label>
+                                <input type="number" id="x2" value="0" step="any" class="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 rounded-lg px-3 py-2 text-sm text-white mono outline-none transition">
+                            </div>
+                            <div>
+                                <label class="text-xs text-zinc-400 mb-1 block">Y₂ Coordinate</label>
+                                <input type="number" id="y2" value="0" step="any" class="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 rounded-lg px-3 py-2 text-sm text-white mono outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900/80 border border-zinc-800/80 rounded-2xl p-6 shadow-xl space-y-4 backdrop-blur-sm">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-zinc-200 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h6m-6 4h6M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        Step-by-Step Distance Breakdown
+                    </h3>
+                    <span class="text-[11px] text-zinc-400 mono">Formula: d = √[(Δx)² + (Δy)²]</span>
+                </div>
+
+                <div class="space-y-3 text-xs mono">
+                    <div class="p-3 bg-zinc-950/70 rounded-lg border border-zinc-800/80 flex justify-between items-center hover:border-zinc-700 transition">
+                        <span class="text-zinc-400">1. Coordinate Offsets (Δ):</span>
+                        <div class="text-right space-y-0.5">
+                            <p class="text-zinc-200">Δx = X₂ - X₁ = <span id="calc-dx-formula">0 - 0 = 0</span></p>
+                            <p class="text-zinc-200">Δy = Y₂ - Y₁ = <span id="calc-dy-formula">0 - 0 = 0</span></p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-zinc-950/70 rounded-lg border border-zinc-800/80 flex justify-between items-center hover:border-zinc-700 transition">
+                        <span class="text-zinc-400">2. Square Offsets:</span>
+                        <div class="text-right space-y-0.5">
+                            <p class="text-zinc-200">Δx² = <span id="calc-dx2-formula">(0)² = 0</span></p>
+                            <p class="text-zinc-200">Δy² = <span id="calc-dy2-formula">(0)² = 0</span></p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-zinc-950/70 rounded-lg border border-zinc-800/80 flex justify-between items-center hover:border-zinc-700 transition">
+                        <span class="text-zinc-400">3. Sum of Squares:</span>
+                        <span class="text-zinc-100 font-semibold" id="calc-sum-formula">0 + 0 = 0</span>
+                    </div>
+
+                    <div class="p-3 bg-zinc-950/70 rounded-lg border border-zinc-800/80 flex justify-between items-center hover:border-zinc-700 transition">
+                        <span class="text-zinc-400">4. Square Root (Euclidean Distance):</span>
+                        <span class="text-white font-semibold" id="calc-sqrt-formula">√0 = 0</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-6 flex flex-col gap-6">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 rounded-2xl p-5 relative overflow-hidden shadow-lg group hover:border-zinc-700 transition">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-zinc-800/30 rounded-full blur-2xl group-hover:bg-zinc-800/50 transition"></div>
+                    <span class="text-xs text-zinc-400 font-medium uppercase tracking-wider block mb-1">Euclidean Distance</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="result-distance" class="text-3xl font-extrabold text-white mono">0</span>
+                        <span class="text-xs text-zinc-400">units</span>
+                    </div>
+                    <button id="btn-copy-dist" class="mt-3 text-xs text-zinc-300 hover:text-white flex items-center gap-1.5 transition font-medium active:scale-95">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        Copy Result
+                    </button>
+                </div>
+
+                <div class="bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 rounded-2xl p-5 relative overflow-hidden shadow-lg group hover:border-zinc-700 transition">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-zinc-800/30 rounded-full blur-2xl group-hover:bg-zinc-800/50 transition"></div>
+                    <span id="scaled-unit-label" class="text-xs text-zinc-400 font-medium uppercase tracking-wider block mb-1">Scaled Distance Meters</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="result-100m" class="text-3xl font-extrabold text-zinc-100 mono">0</span>
+                        <span id="scaled-unit-name" class="text-xs text-zinc-400">meters</span>
+                    </div>
+                    <p class="text-[11px] text-zinc-400 mt-1" id="m-breakdown">(0 units × 100m = 0m)</p>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900/80 border border-zinc-800/80 rounded-2xl p-4 shadow-xl flex flex-col items-center justify-between flex-grow backdrop-blur-sm">
+                <div class="w-full flex items-center justify-between mb-3 px-2">
+                    <span class="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-zinc-200 animate-pulse"></span>
+                        Point A Centered Grid Plotter
+                    </span>
+                    <div class="flex items-center gap-4 text-[11px] text-zinc-400">
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 border border-white"></span> Point A</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white"></span> Point B (Drag)</span>
+                    </div>
+                </div>
+                
+                <div class="w-full aspect-square max-w-[460px] bg-black rounded-xl overflow-hidden border border-zinc-800 relative shadow-inner flex items-center justify-center">
+                    <canvas id="gridCanvas" class="w-full h-full block cursor-crosshair touch-none"></canvas>
+                </div>
+
+                <div class="w-full mt-3 px-2 flex items-center justify-between text-[11px] text-zinc-400">
+                    <p class="flex items-center gap-1">
+                        📍 <strong class="text-zinc-200">Point A</strong> stays locked at canvas center. Drag <strong class="text-zinc-200">Point B</strong>!
+                    </p>
+                    <span id="polar-angle" class="mono text-zinc-300">Angle: 0.0°</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="border-t border-zinc-800/80 bg-zinc-950/80 py-4 text-center text-xs text-zinc-500">
+        <p>BootBoyWares</p>
+    </footer>
+
+    <div id="toast" class="fixed bottom-6 right-6 bg-zinc-800 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-medium translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50 border border-zinc-700 flex items-center gap-2">
+        <svg class="w-4 h-4 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span>Copied to clipboard!</span>
+    </div>
+
+    <script>
+        const x1Input = document.getElementById('x1');
+        const y1Input = document.getElementById('y1');
+        const x2Input = document.getElementById('x2');
+        const y2Input = document.getElementById('y2');
+        const unitScaleSelect = document.getElementById('unit-scale-select');
+
+        const calcDxFormula = document.getElementById('calc-dx-formula');
+        const calcDyFormula = document.getElementById('calc-dy-formula');
+        const calcDx2Formula = document.getElementById('calc-dx2-formula');
+        const calcDy2Formula = document.getElementById('calc-dy2-formula');
+        const calcSumFormula = document.getElementById('calc-sum-formula');
+        const calcSqrtFormula = document.getElementById('calc-sqrt-formula');
+
+        const resultDistance = document.getElementById('result-distance');
+        const result100m = document.getElementById('result-100m');
+        const mBreakdown = document.getElementById('m-breakdown');
+        const scaledUnitLabel = document.getElementById('scaled-unit-label');
+        const scaledUnitName = document.getElementById('scaled-unit-name');
+        const polarAngle = document.getElementById('polar-angle');
+
+        const btnReset = document.getElementById('btn-reset');
+        const btnCopyDist = document.getElementById('btn-copy-dist');
+        const toast = document.getElementById('toast');
+
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDraggingPointB = false;
+
+        function calculate() {
+            const x1 = parseFloat(x1Input.value) || 0;
+            const y1 = parseFloat(y1Input.value) || 0;
+            const x2 = parseFloat(x2Input.value) || 0;
+            const y2 = parseFloat(y2Input.value) || 0;
+
+            const scaleMultiplier = parseFloat(unitScaleSelect.value) || 100;
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+
+            const dx2 = dx * dx;
+            const dy2 = dy * dy;
+
+            const sum = dx2 + dy2;
+            const distance = Math.sqrt(sum);
+            const scaledDistance = distance * scaleMultiplier;
+
+            let angleRad = Math.atan2(dy, dx);
+            let angleDeg = angleRad * (180 / Math.PI);
+            if (angleDeg < 0) angleDeg += 360;
+
+            const fmt = num => {
+                if (Number.isInteger(num)) return num.toString();
+                return num.toFixed(3);
+            };
+
+            calcDxFormula.textContent = `${x2} - ${x1} = ${fmt(dx)}`;
+            calcDyFormula.textContent = `${y2} - ${y1} = ${fmt(dy)}`;
+
+            calcDx2Formula.textContent = `(${fmt(dx)})² = ${fmt(dx2)}`;
+            calcDy2Formula.textContent = `(${fmt(dy)})² = ${fmt(dy2)}`;
+
+            calcSumFormula.textContent = `${fmt(dx2)} + ${fmt(dy2)} = ${fmt(sum)}`;
+            calcSqrtFormula.textContent = `√(${fmt(sum)}) = ${fmt(distance)}`;
+
+            resultDistance.textContent = fmt(distance);
+            result100m.textContent = fmt(scaledDistance);
+
+            let unitText = 'meters';
+            if (scaleMultiplier === 1) unitText = 'meters';
+            else if (scaleMultiplier === 1000) unitText = 'km';
+            else if (scaleMultiplier === 0.3048) unitText = 'feet';
+            else unitText = 'meters';
+
+            scaledUnitLabel.textContent = `Scaled Distance Meters`;
+            scaledUnitName.textContent = unitText;
+            mBreakdown.textContent = `(${fmt(distance)} units × ${scaleMultiplier}m = ${fmt(scaledDistance)}${unitText.charAt(0)})`;
+
+            polarAngle.textContent = `Angle: ${angleDeg.toFixed(1)}°`;
+
+            drawCenteredGrid(x1, y1, x2, y2);
+        }
+
+        function drawCenteredGrid(x1, y1, x2, y2) {
+            const container = canvas.parentNode;
+            const rect = container.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            const relX = x2 - x1;
+            const relY = y2 - y1;
+
+            const maxOffset = Math.max(Math.abs(relX), Math.abs(relY), 5) + 3;
+            const scale = (width / 2) / Math.max(maxOffset, 6);
+
+            canvas.toCartesianOffset = (px, py) => {
+                return {
+                    dx: (px - centerX) / scale,
+                    dy: (centerY - py) / scale
+                };
+            };
+
+            ctx.strokeStyle = '#18181b';
+            ctx.lineWidth = 1;
+
+            const gridStep = Math.max(1, Math.pow(10, Math.floor(Math.log10(maxOffset)))) / 2 || 1;
+
+            for (let i = -Math.ceil(maxOffset * 2); i <= Math.ceil(maxOffset * 2); i += gridStep) {
+                const gridPx = centerX + i * scale;
+                if (gridPx >= 0 && gridPx <= width) {
+                    ctx.beginPath();
+                    ctx.moveTo(gridPx, 0);
+                    ctx.lineTo(gridPx, height);
+                    ctx.stroke();
+                }
+
+                const gridPy = centerY - i * scale;
+                if (gridPy >= 0 && gridPy <= height) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, gridPy);
+                    ctx.lineTo(width, gridPy);
+                    ctx.stroke();
+                }
+            }
+
+            ctx.strokeStyle = '#27272a';
+            ctx.lineWidth = 1.5;
+
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(width, centerY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, height);
+            ctx.stroke();
+
+            const pB_CanvasX = centerX + relX * scale;
+            const pB_CanvasY = centerY - relY * scale;
+
+            ctx.setLineDash([4, 4]);
+            
+            ctx.strokeStyle = '#6366f1';
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(pB_CanvasX, centerY);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#10b981';
+            ctx.beginPath();
+            ctx.moveTo(pB_CanvasX, centerY);
+            ctx.lineTo(pB_CanvasX, pB_CanvasY);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+
+            ctx.strokeStyle = '#22d3ee';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(pB_CanvasX, pB_CanvasY);
+            ctx.stroke();
+
+            ctx.fillStyle = '#6366f1';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 13, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.arc(pB_CanvasX, pB_CanvasY, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.font = '600 11px JetBrains Mono, monospace';
+            
+            ctx.fillStyle = '#a5b4fc';
+            ctx.fillText(`A (${x1}, ${y1}) [CENTER]`, centerX + 12, centerY - 12);
+
+            ctx.fillStyle = '#6ee7b7';
+            ctx.fillText(`B (${x2}, ${y2})`, pB_CanvasX + 12, pB_CanvasY - 12);
+        }
+
+        function getCanvasMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function handlePointerDown(e) {
+            const pos = getCanvasMousePos(e);
+            const x1 = parseFloat(x1Input.value) || 0;
+            const y1 = parseFloat(y1Input.value) || 0;
+            const x2 = parseFloat(x2Input.value) || 0;
+            const y2 = parseFloat(y2Input.value) || 0;
+
+            const rect = canvas.getBoundingClientRect();
+            const relX = x2 - x1;
+            const relY = y2 - y1;
+            const maxOffset = Math.max(Math.abs(relX), Math.abs(relY), 5) + 3;
+            const scale = (rect.width / 2) / Math.max(maxOffset, 6);
+
+            const pB_CanvasX = (rect.width / 2) + relX * scale;
+            const pB_CanvasY = (rect.width / 2) - relY * scale;
+
+            const distToB = Math.hypot(pos.x - pB_CanvasX, pos.y - pB_CanvasY);
+
+            if (distToB < 30) {
+                isDraggingPointB = true;
+            }
+        }
+
+        function handlePointerMove(e) {
+            if (!isDraggingPointB) return;
+            e.preventDefault();
+
+            const pos = getCanvasMousePos(e);
+            const offset = canvas.toCartesianOffset(pos.x, pos.y);
+
+            const x1 = parseFloat(x1Input.value) || 0;
+            const y1 = parseFloat(y1Input.value) || 0;
+
+            const newX2 = Math.round((x1 + offset.dx) * 10) / 10;
+            const newY2 = Math.round((y1 + offset.dy) * 10) / 10;
+
+            x2Input.value = newX2;
+            y2Input.value = newY2;
+
+            calculate();
+        }
+
+        function handlePointerUp() {
+            isDraggingPointB = false;
+        }
+
+        btnCopyDist.addEventListener('click', () => {
+            const val = resultDistance.textContent;
+            const textToCopy = `Distance: ${val} units (${result100m.textContent} ${scaledUnitName.textContent})`;
+            
+            const tempInput = document.createElement('input');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2000);
+        });
+
+        [x1Input, y1Input, x2Input, y2Input].forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        unitScaleSelect.addEventListener('change', calculate);
+
+        btnReset.addEventListener('click', () => {
+            x1Input.value = 0;
+            y1Input.value = 0;
+            x2Input.value = 0;
+            y2Input.value = 0;
+            calculate();
+        });
+
+        canvas.addEventListener('mousedown', handlePointerDown);
+        canvas.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('mouseup', handlePointerUp);
+
+        canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+        canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+        window.addEventListener('touchend', handlePointerUp);
+
+        window.addEventListener('resize', calculate);
+
+        window.onload = () => {
+            calculate();
+        };
+    </script>
+</body>
+</html>
